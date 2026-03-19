@@ -11,6 +11,8 @@ export interface Video {
   latitude: number;
   longitude: number;
   createdAt: string;
+  tripId?: string;      // Optional: To group videos of the same trip
+  tripOrder?: number;   // Optional: To order the videos within a trip
 }
 
 export interface Page<T> {

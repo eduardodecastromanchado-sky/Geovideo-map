@@ -1,0 +1,13 @@
+<div class="panel-header" *ngIf="video">
+  <h4>{{ video.title }}</h4>
+  <button class="close-btn" (click)="close.emit()">&times;</button>
+</div>
+<div class="panel-content" *ngIf="video">
+  <iframe 
+    [src]="getSafeVideoUrl()" 
+    frameborder="0" 
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+    allowfullscreen>
+  </iframe>
+  <p>{{ video.description || 'No description available.' }}</p>
+</div>

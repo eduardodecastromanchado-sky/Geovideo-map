@@ -1,1 +1,8 @@
 <div #cesiumContainer class="cesium-container"></div>
+
+<!-- Custom Video Info Panel -->
+<app-video-info-panel 
+  *ngIf="isInfoPanelVisible && selectedVideo" 
+  [video]="selectedVideo" 
+  (close)="closePanel()">
+</app-video-info-panel>

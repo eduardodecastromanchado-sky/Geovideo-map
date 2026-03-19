@@ -11,40 +11,50 @@ import jakarta.persistence.Table;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.locationtech.jts.geom.Point;
 
-import java.time.Instant;
-import java.util.UUID;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
-@Table(name = "videos")
+@Table(name = "youtube_videos")
 public class Video {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Column(nullable = false)
-    private String youtubeId;
-
-    @Column(nullable = false)
+    @Column(name = "titulo", nullable = false)
     private String title;
 
+    @Column(name = "descripcion", columnDefinition = "LONGTEXT")
     private String description;
 
-    @Column(nullable = false, columnDefinition = "GEOMETRY(Point, 4326)")
-    private Point location;
+    @Column(name = "id_youtube")
+    private String youtubeId;
+
+    @Column(name = "latitude", precision = 10, scale = 8)
+    private Double latitude;
+
+    @Column(name = "longitude", precision = 11, scale = 8)
+    private Double longitude;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private VideoStatus status = VideoStatus.PENDING;
+    @Column(name = "estado")
+    private VideoStatus status;
 
-    private UUID userId;
+    @Column(name = "trip_id") // This column will be added by hibernate
+    private String tripId;
 
+    @Column(name = "trip_order") // This column will be added by hibernate
+    private Integer tripOrder;
+
+    @Column(name = "fecha_creacion", updatable = false)
     @CreationTimestamp
-    private Instant createdAt;
+    private LocalDateTime createdAt;
 
+    @Column(name = "fecha_edicion")
     @UpdateTimestamp
-    private Instant updatedAt;
+    private LocalDateTime updatedAt;
+    
+    // Note: Other fields from DDL like 'gancho', 'visitas', etc., are omitted for now for simplicity.
 }
