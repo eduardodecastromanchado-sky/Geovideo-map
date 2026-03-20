@@ -3,5 +3,8 @@ package com.geovideomap.monolith.video;
 public enum VideoStatus {
     PENDING,
     APPROVED,
-    REJECTED
+    REJECTED,
+    guion,
+    publicado,
+    borrador
 }

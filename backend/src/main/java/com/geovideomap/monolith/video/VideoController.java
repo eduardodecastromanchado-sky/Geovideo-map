@@ -27,11 +27,11 @@ public class VideoController {
             @RequestParam(required = false) String tripId) {
         
         Page<Video> videos;
-        if (tripId != null && !tripId.isEmpty()) {
-            videos = videoRepository.findByTripId(tripId, pageable);
-        } else {
+//        if (tripId != null && !tripId.isEmpty()) {
+//            videos = videoRepository.findByTripId(tripId, pageable);
+//        } else {
             videos = videoRepository.findAll(pageable);
-        }
+//        }
         
         return ResponseEntity.ok(videos);
     }

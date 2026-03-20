@@ -21,7 +21,7 @@ public class Video {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @Column(name = "titulo", nullable = false)
     private String title;
@@ -32,21 +32,21 @@ public class Video {
     @Column(name = "id_youtube")
     private String youtubeId;
 
-    @Column(name = "latitude", precision = 10, scale = 8)
+    @Column(name = "latitude")
     private Double latitude;
 
-    @Column(name = "longitude", precision = 11, scale = 8)
+    @Column(name = "longitude")
     private Double longitude;
 
-    @Enumerated(EnumType.STRING)
+//    @Enumerated(EnumType.STRING)
     @Column(name = "estado")
-    private VideoStatus status;
+    private String status;
 
-    @Column(name = "trip_id") // This column will be added by hibernate
-    private String tripId;
+//    @Column(name = "trip_id") // This column will be added by hibernate
+//    private String tripId;
 
-    @Column(name = "trip_order") // This column will be added by hibernate
-    private Integer tripOrder;
+//    @Column(name = "trip_order") // This column will be added by hibernate
+//    private Integer tripOrder;
 
     @Column(name = "fecha_creacion", updatable = false)
     @CreationTimestamp

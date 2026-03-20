@@ -1,17 +1,18 @@
 <!-- We only render the content if the video object actually exists -->
 <ng-container *ngIf="video">
   <div class="panel-header">
-    <h4>{{ video.title }}</h4>
+    <h4>{{ video?.title }}</h4>
     <button class="close-btn" (click)="close.emit()">&times;</button>
   </div>
   <div class="panel-content">
     <iframe 
-      [src]="getSafeVideoUrl()" 
+      [src]="safeVideoUrl" 
       frameborder="0" 
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+      referrerpolicy="strict-origin-when-cross-origin"
       allowfullscreen>
     </iframe>
     <!-- Corrected syntax for default description -->
-    <p>{{ video.description || 'No description available.' }}</p>
+    <p>{{ video?.description || 'No description available.' }}</p>
   </div>
 </ng-container>
