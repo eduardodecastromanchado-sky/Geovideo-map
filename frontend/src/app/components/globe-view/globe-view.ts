@@ -42,7 +42,7 @@ export class GlobeViewComponent implements AfterViewInit {
   ngAfterViewInit(): void {
     if (this.cesiumContainer) {
       // 1. INICIALIZACIÓN ESTÁNDAR Y ESTABLE
-      this.viewer = new Cesium.Viewer(this.cesiumContainer.nativeElement, {
+       this.viewer = new Cesium.Viewer(this.cesiumContainer.nativeElement, {
         animation: false,
         timeline: false,
         homeButton: false,
@@ -52,32 +52,21 @@ export class GlobeViewComponent implements AfterViewInit {
         sceneModePicker: false,
         infoBox: false,
         selectionIndicator: false,
-        requestRenderMode: false, // ¡VOLVEMOS A RENDERIZADO CONTINUO!
+        // Usamos ArcGIS DE INICIO para evitar conflictos de inicialización asíncrona
+        imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+          url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
+        })
       });
 
-      // 2. CONFIGURACIÓN DE CAPAS SATELITALES (ArcGIS es muy estable)
-      const imageryLayers = this.viewer.imageryLayers;
-      imageryLayers.removeAll();
-      
-      imageryLayers.addImageryProvider(new Cesium.ArcGisMapServerImageryProvider({
-        url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
-      }));
-
-      // Intentamos añadir Ion satélite como capa superior (si funciona, mejor calidad)
-      try {
-        imageryLayers.addImageryProvider(new Cesium.IonImageryProvider({ assetId: 3 }));
-      } catch (e) {
-        console.warn('Ion no disponible, manteniendo ArcGIS.');
-      }
-
-      // 3. AJUSTES VISUALES EQUILIBRADOS
+      // 1. AJUSTES DE ESCENA Y GLOBO (Estabilidad total)
       const scene = this.viewer.scene;
-      scene.globe.baseColor = Cesium.Color.BLACK;
-      scene.globe.showGroundAtmosphere = true;
+      const globe = scene.globe;
+
+      globe.baseColor = Cesium.Color.BLACK;
+      globe.showGroundAtmosphere = false; // Evita el tinte azul/negro en los bordes
       scene.skyAtmosphere.show = true;
-      scene.fog.enabled = true;
-      scene.fog.density = 0.0001; 
-      scene.logarithmicDepthBuffer = false; // Ayuda en móviles
+      scene.fog.enabled = false; // Desactivar niebla para evitar el error de renderizado en Android
+      scene.logarithmicDepthBuffer = false; 
 
       // Detección de dispositivo móvil para resolución
       const isMobile = /Mobi|Android/i.test(navigator.userAgent);
