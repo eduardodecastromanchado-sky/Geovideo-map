@@ -51,11 +51,24 @@ export class GlobeViewComponent implements AfterViewInit {
         sceneModePicker: false,
         infoBox: false,
         selectionIndicator: false,
-        // Usamos OpenStreetMap como base para evitar el globo negro cuando Cesium Ion falla
-        imageryProvider: new Cesium.OpenStreetMapImageryProvider({
-          url: 'https://a.tile.openstreetmap.org/'
-        })
+        // Usamos la capa de terreno y fotos base de Cesium por defecto
+        terrainProvider: Cesium.createWorldTerrain ? Cesium.createWorldTerrain() : undefined
       });
+
+      // Asegurar que tenemos una capa de imágenes satelitales (World Imagery)
+      // Si el usuario no tiene token, Cesium mostrará un aviso pero intentará cargar texturas básicas
+      try {
+        this.viewer.imageryLayers.addImageryProvider(new Cesium.IonImageryProvider({ assetId: 3 }));
+      } catch (e) {
+        console.warn('Fallo al cargar IonImageryProvider, usando alternativa.', e);
+      }
+
+      // AJUSTE CRÍTICO: Eliminar el exceso de color azul (atmósfera/niebla)
+      this.viewer.scene.skyAtmosphere.show = true;
+      this.viewer.scene.fog.enabled = true;
+      this.viewer.scene.fog.density = 0.0001; // Muy baja para que no se vea azul/blanco
+      this.viewer.scene.globe.showGroundAtmosphere = true;
+      this.viewer.scene.highDynamicRange = true;
 
       // Optimización Móvil y Rendimiento
       const isMobile = /Mobi|Android/i.test(navigator.userAgent);
