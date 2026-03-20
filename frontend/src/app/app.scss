@@ -11,7 +11,7 @@
   align-items: center;
   pointer-events: none; // Permite clics al globo de fondo
 
-  .branding {
+   .branding {
     display: flex;
     align-items: center;
     gap: 15px;
@@ -21,6 +21,10 @@
       height: 50px;
       width: auto;
       filter: drop-shadow(0 0 10px rgba(0, 242, 255, 0.5));
+
+      @media (max-width: 600px) {
+        height: 35px;
+      }
     }
 
     .brand-text {
@@ -35,6 +39,10 @@
         color: #fff;
         line-height: 1;
         text-shadow: 0 0 10px rgba(0, 242, 255, 0.3);
+
+        @media (max-width: 600px) {
+          font-size: 1rem;
+        }
       }
 
       .sub-title {
@@ -44,6 +52,11 @@
         color: #00f2ff;
         opacity: 0.9;
         font-weight: 500;
+
+        @media (max-width: 600px) {
+          font-size: 0.5rem;
+          letter-spacing: 0.15em;
+        }
       }
     }
   }
@@ -93,6 +106,13 @@
     font-weight: 600;
     pointer-events: none;
     animation: blink 2s infinite;
+    text-align: center;
+    white-space: nowrap;
+
+    @media (max-width: 600px) {
+      font-size: 0.8rem;
+      padding: 10px 20px;
+    }
   }
 
   .skip-btn {

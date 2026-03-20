@@ -41,7 +41,7 @@ export class GlobeViewComponent implements AfterViewInit {
 
   ngAfterViewInit(): void {
     if (this.cesiumContainer) {
-      this.viewer = new Cesium.Viewer(this.cesiumContainer.nativeElement, {
+       this.viewer = new Cesium.Viewer(this.cesiumContainer.nativeElement, {
         animation: false,
         timeline: false,
         homeButton: false,
@@ -49,8 +49,31 @@ export class GlobeViewComponent implements AfterViewInit {
         navigationHelpButton: false,
         baseLayerPicker: false,
         sceneModePicker: false,
-        infoBox: false, // Disable default InfoBox
-        selectionIndicator: false // Disable default selection box (green box)
+        infoBox: false,
+        selectionIndicator: false,
+        // Usamos OpenStreetMap como base para evitar el globo negro cuando Cesium Ion falla
+        imageryProvider: new Cesium.OpenStreetMapImageryProvider({
+          url: 'https://a.tile.openstreetmap.org/'
+        })
+      });
+
+      // Optimización Móvil y Rendimiento
+      const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+      if (isMobile) {
+        console.log('Mobile device detected. Optimizing Cesium performance.');
+        this.viewer.resolutionScale = 0.7; // Reducir escala de resolución para ganar fluidez
+        this.viewer.scene.debugShowFramesPerSecond = false;
+        this.viewer.scene.fog.enabled = false; // Deshabilitar niebla para ahorrar GPU
+      }
+
+      // Posicionamiento inicial de la cámara para que no se vea vacío el mundo
+      this.viewer.camera.setView({
+        destination: Cesium.Cartesian3.fromDegrees(-70, 18, 15000000), // Ver América/Caribe desde el espacio a altura razonable
+        orientation: {
+          heading: 0,
+          pitch: Cesium.Math.toRadians(-90),
+          roll: 0
+        }
       });
 
       // Initialize styles once Cesium is available in the viewer context

@@ -26,9 +26,10 @@ export class App implements AfterViewInit {
       
       // Aumentamos a 1000ms (1 segundo) para evitar conflictos de carga inicial
       setTimeout(() => {
+        video.playbackRate = 1.5; // ACELERACIÓN A 1.5X POR PETICIÓN DEL USUARIO
         video.play()
           .then(() => {
-            console.log('Autoplay iniciado con éxito tras 1s');
+            console.log('Autoplay iniciado con éxito tras 1s a 1.5x');
             this.showPlayHint = false;
             this.cdr.detectChanges();
           })
@@ -37,14 +38,6 @@ export class App implements AfterViewInit {
             this.showPlayHint = true;
             this.cdr.detectChanges();
           });
-      }, 1000);
-
-      // Verificación adicional al segundo 1
-      setTimeout(() => {
-        if (video.paused && this.showSplash) {
-          this.showPlayHint = true;
-          this.cdr.detectChanges();
-        }
       }, 1000);
 
       // SEGURIDAD: Si después de 10 segundos la intro no ha terminado, la quitamos a la fuerza
@@ -84,7 +77,7 @@ export class App implements AfterViewInit {
 
   onTimeUpdate(event: Event): void {
     const video = event.target as HTMLVideoElement;
-    // Activamos la transición 1.2 segundos antes del final para que coincida con el logo
+    // Activamos la transición 1.2 segundos antes del final
     if (video.duration && video.duration - video.currentTime < 1.2) {
       if (!this.isFadingOut) {
         console.log('Iniciando transición cinematográfica final.');
@@ -92,5 +85,9 @@ export class App implements AfterViewInit {
         this.cdr.detectChanges();
       }
     }
+  }
+
+  onVideoEnded(): void {
+    this.onSplashEnded();
   }
 }
