@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, HostBinding, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, HostBinding, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Video } from '../../services/video-api';
@@ -16,16 +16,28 @@ export class VideoInfoPanelComponent implements OnChanges {
   @Output() close = new EventEmitter<void>();
 
   safeVideoUrl: SafeResourceUrl | null = null;
+  isDescriptionExpanded: boolean = false;
+  isVideoVisible: boolean = false;
 
   @HostBinding('class.hidden')
   get isHidden() {
     return this.video === null;
   }
 
-  constructor(private sanitizer: DomSanitizer) { }
+  toggleDescription(): void {
+    this.isDescriptionExpanded = !this.isDescriptionExpanded;
+  }
+
+  playVideo(): void {
+    this.isVideoVisible = true;
+  }
+
+  constructor(private sanitizer: DomSanitizer, private cdr: ChangeDetectorRef) { }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['video'] && this.video) {
+      this.isVideoVisible = false;
+      this.isDescriptionExpanded = false;
       this.updateSafeVideoUrl();
     }
   }

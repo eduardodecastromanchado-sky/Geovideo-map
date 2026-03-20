@@ -1,18 +1,46 @@
-<!-- We only render the content if the video object actually exists -->
+<div class="modal-overlay" (click)="close.emit()" *ngIf="video"></div>
+
 <ng-container *ngIf="video">
-  <div class="panel-header">
-    <h4>{{ video?.title }}</h4>
-    <button class="close-btn" (click)="close.emit()">&times;</button>
-  </div>
-  <div class="panel-content">
-    <iframe 
-      [src]="safeVideoUrl" 
-      frameborder="0" 
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-      referrerpolicy="strict-origin-when-cross-origin"
-      allowfullscreen>
-    </iframe>
-    <!-- Corrected syntax for default description -->
-    <p>{{ video?.description || 'No description available.' }}</p>
-  </div>
+  <div class="modal-container">
+    <div class="panel-header">
+      <h4 class="modal-video-title">{{ video?.title }}</h4>
+      <button class="close-btn" (click)="close.emit()">&times;</button>
+    </div>
+      <!-- Video Area -->
+      <div class="video-container">
+        <!-- Placeholder/Play Button -->
+        <div class="video-placeholder" *ngIf="!isVideoVisible" (click)="playVideo()">
+          <img [src]="'https://img.youtube.com/vi/' + video.youtubeId + '/maxresdefault.jpg'" 
+               alt="Video Thumbnail"
+               (error)="$event.target.src = 'https://img.youtube.com/vi/' + video.youtubeId + '/0.jpg'">
+          <div class="play-overlay">
+            <div class="play-icon"></div>
+          </div>
+        </div>
+
+        <!-- Actual Iframe -->
+        <iframe 
+          *ngIf="isVideoVisible"
+          [src]="safeVideoUrl" 
+          frameborder="0" 
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+          referrerpolicy="strict-origin-when-cross-origin"
+          allowfullscreen>
+        </iframe>
+      </div>
+
+      <!-- Description Area -->
+      <div class="description-container" [class.expanded]="isDescriptionExpanded">
+        <p>{{ video?.description || 'No description available.' }}</p>
+      </div>
+
+      <button class="toggle-description-btn" (click)="toggleDescription()" *ngIf="video.description && video.description.length > 100">
+        {{ isDescriptionExpanded ? 'Mostrar menos' : 'Leer más' }}
+      </button>
+
+      <div class="metadata">
+        <span class="date">{{ video?.createdAt | date:'longDate' }}</span>
+        <span class="coords">{{ video?.latitude | number:'1.4-4' }}, {{ video?.longitude | number:'1.4-4' }}</span>
+      </div>
+    </div>
 </ng-container>

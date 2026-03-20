@@ -1,5 +1,50 @@
-<h1>GeoVideo Map</h1>
+<!-- Global Splash Screen (Cyber Globe Scan Animation) -->
+<div class="splash-screen cyber-scan" *ngIf="showSplash" [class.fade-out]="isFadingOut">
+  <div class="grid-layer"></div>
+  <div class="scanner-line"></div>
+  
+  <div class="scan-content">
+    <div class="loading-ui">
+      <div class="scanning-text">ESTABLISHING SATELLITE UPLINK...</div>
+      <div class="status-bar"><div class="progress"></div></div>
+      <div class="coords">LAT: 19.29025 N | LON: 69.42848 W</div>
+    </div>
 
-<app-globe-view></app-globe-view>
+    <div class="logo-container">
+      <img src="assets/logo.png" alt="SKY DRIFT" class="cyber-logo">
+      <div class="logo-glitch-layer"></div>
+    </div>
+  </div>
+
+  <button class="skip-btn" (click)="onSplashEnded()">BYPASS SYSTEM</button>
+</div>
+
+<!-- Subscription Modal -->
+<div class="modal-backdrop" *ngIf="showSubscribeModal" (click)="closeSubscribeModal()">
+  <div class="subscribe-modal" (click)="$event.stopPropagation()">
+    <img src="assets/logo.png" alt="SKY DRIFT" class="modal-logo">
+    <h3>¡Únete a la Aventura!</h3>
+    <p>Suscríbete a nuestro canal de YouTube para ver más perspectivas elevadas.</p>
+    <div class="modal-actions">
+      <button class="subscribe-btn" (click)="goToYoutube()">SUSCRIBIRME EN YOUTUBE</button>
+      <button class="close-modal-btn" (click)="closeSubscribeModal()">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Main Transparent Header -->
+<header class="app-header">
+  <div class="branding" (click)="openSubscribeModal()" style="cursor: pointer;">
+    <img src="assets/logo.png" alt="SKY DRIFT" class="logo">
+    <div class="brand-text">
+      <span class="main-title">SKY DRIFT</span>
+      <span class="sub-title">Elevated Perspectives</span>
+    </div>
+  </div>
+</header>
+
+<main class="content-area">
+  <app-globe-view></app-globe-view>
+</main>
 
 <router-outlet />

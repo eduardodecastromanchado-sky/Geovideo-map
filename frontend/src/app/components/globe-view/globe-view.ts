@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, ViewChild, ElementRef, NgZone } from '@angular/core';
+import { Component, AfterViewInit, ViewChild, ElementRef, NgZone, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { VideoApiService, Page, Video } from '../../services/video-api';
 import { VideoInfoPanelComponent } from '../video-info-panel/video-info-panel';
@@ -35,7 +35,8 @@ export class GlobeViewComponent implements AfterViewInit {
 
   constructor(
     private videoApiService: VideoApiService,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngAfterViewInit(): void {
@@ -155,6 +156,7 @@ export class GlobeViewComponent implements AfterViewInit {
           // Update selected video and show panel
           this.selectedVideo = video;
           this.isInfoPanelVisible = true;
+          this.cdr.detectChanges(); // FORZAMOS EL REFRESCO EN MODO ZONELESS
 
           // Reset previous highlight
           if (this.lastHighlighted && this.lastHighlighted !== entity) {
@@ -179,6 +181,7 @@ export class GlobeViewComponent implements AfterViewInit {
   closePanel(): void {
     this.isInfoPanelVisible = false;
     this.selectedVideo = null;
+    this.cdr.detectChanges(); // FORZAMOS EL REFRESCO EN MODO ZONELESS
     if (this.lastHighlighted) {
       this.lastHighlighted.point = this.defaultPointStyle;
       this.lastHighlighted = null;
