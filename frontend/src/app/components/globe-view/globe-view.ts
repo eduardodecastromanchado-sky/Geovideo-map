@@ -50,23 +50,25 @@ export class GlobeViewComponent implements AfterViewInit {
         navigationHelpButton: false,
         baseLayerPicker: false,
         sceneModePicker: false,
+        showRenderLoopErrors: false, // Ocultar avisos técnicos
         infoBox: false,
         selectionIndicator: false,
-        // Usamos ArcGIS DE INICIO para evitar conflictos de inicialización asíncrona
+        // PROVEEDOR SATELITAL ÚNICO Y ROBUSTO
         imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
           url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
         })
       });
 
-      // 1. AJUSTES DE ESCENA Y GLOBO (Estabilidad total)
+      // 1. SOLUCIÓN RADICAL GLOBO NEGRO (Configuración de Escena)
       const scene = this.viewer.scene;
       const globe = scene.globe;
 
-      globe.baseColor = Cesium.Color.BLACK;
-      globe.showGroundAtmosphere = false; // Evita el tinte azul/negro en los bordes
-      scene.skyAtmosphere.show = true;
-      scene.fog.enabled = false; // Desactivar niebla para evitar el error de renderizado en Android
-      scene.logarithmicDepthBuffer = false; 
+      globe.enableLighting = false; // ¡CLAVE! Muestra el mapa iluminado siempre (evita sombras nocturnas)
+      globe.baseColor = Cesium.Color.NAVY; // Color de fondo si el satélite tarda (mar azul)
+      globe.showGroundAtmosphere = false; 
+      scene.skyAtmosphere.show = false;
+      scene.fog.enabled = false; 
+      scene.logarithmicDepthBuffer = false; // Máxima compatibilidad con GPUs antiguas/portátiles
 
       // Detección de dispositivo móvil para resolución
       const isMobile = /Mobi|Android/i.test(navigator.userAgent);
