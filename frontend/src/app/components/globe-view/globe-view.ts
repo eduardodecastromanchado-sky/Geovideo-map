@@ -50,25 +50,32 @@ export class GlobeViewComponent implements AfterViewInit {
         navigationHelpButton: false,
         baseLayerPicker: false,
         sceneModePicker: false,
-        showRenderLoopErrors: false, // Ocultar avisos técnicos
+        showRenderLoopErrors: false,
         infoBox: false,
         selectionIndicator: false,
-        // PROVEEDOR SATELITAL ÚNICO Y ROBUSTO
-        imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
-          url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
+        // CARGA DIRECTA DE TILES (XYZ): La forma más compatible y rápida del mundo
+        imageryProvider: new Cesium.UrlTemplateImageryProvider({
+          url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+          maximumLevel: 19
         })
       });
 
-      // 1. SOLUCIÓN RADICAL GLOBO NEGRO (Configuración de Escena)
+      // 1. AJUSTES VISUALES PARA ESTÉTICA DRONE
       const scene = this.viewer.scene;
       const globe = scene.globe;
 
-      globe.enableLighting = false; // ¡CLAVE! Muestra el mapa iluminado siempre (evita sombras nocturnas)
-      globe.baseColor = Cesium.Color.NAVY; // Color de fondo si el satélite tarda (mar azul)
+      globe.enableLighting = false; // Iluminación constante
+      globe.baseColor = Cesium.Color.fromCssColorString('#0a1a2f'); // Fondo azul espacial neutro
       globe.showGroundAtmosphere = false; 
       scene.skyAtmosphere.show = false;
       scene.fog.enabled = false; 
-      scene.logarithmicDepthBuffer = false; // Máxima compatibilidad con GPUs antiguas/portátiles
+      scene.logarithmicDepthBuffer = false; 
+      
+      // Soporte para pantallas de 120Hz y alta resolución
+      if (typeof window !== 'undefined') {
+        this.viewer.resolutionScale = window.devicePixelRatio || 1.0;
+        if (this.viewer.resolutionScale > 2.0) this.viewer.resolutionScale = 2.0; // Límite de calidad
+      }
 
       // Detección de dispositivo móvil para resolución
       const isMobile = /Mobi|Android/i.test(navigator.userAgent);
