@@ -16,16 +16,11 @@ export class VideoInfoPanelComponent implements OnChanges {
   @Output() close = new EventEmitter<void>();
 
   safeVideoUrl: SafeResourceUrl | null = null;
-  isDescriptionExpanded: boolean = false;
   isVideoVisible: boolean = false;
 
   @HostBinding('class.hidden')
   get isHidden() {
     return this.video === null;
-  }
-
-  toggleDescription(): void {
-    this.isDescriptionExpanded = !this.isDescriptionExpanded;
   }
 
   playVideo(): void {
@@ -37,7 +32,6 @@ export class VideoInfoPanelComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['video'] && this.video) {
       this.isVideoVisible = false;
-      this.isDescriptionExpanded = false;
       this.updateSafeVideoUrl();
     }
   }
@@ -45,8 +39,11 @@ export class VideoInfoPanelComponent implements OnChanges {
   private updateSafeVideoUrl(): void {
     if (this.video && this.video.youtubeId) {
       console.log('Updating safe video URL for:', this.video.youtubeId);
-      const url = `https://www.youtube.com/embed/${this.video.youtubeId}`;
+      // Añadimos autoplay=1 y mute=1 para que el vídeo arranque solo al abrir el panel
+      const url = `https://www.youtube.com/embed/${this.video.youtubeId}?autoplay=1&mute=1`;
       this.safeVideoUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+      
+      this.cdr.detectChanges(); // Aseguramos el refresco en modo Zoneless
     } else {
       console.warn('No video or youtubeId provided to info panel');
       this.safeVideoUrl = null;

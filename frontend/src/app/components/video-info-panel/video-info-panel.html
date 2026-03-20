@@ -10,9 +10,9 @@
       <div class="video-container">
         <!-- Placeholder/Play Button -->
         <div class="video-placeholder" *ngIf="!isVideoVisible" (click)="playVideo()">
-          <img [src]="'https://img.youtube.com/vi/' + video.youtubeId + '/maxresdefault.jpg'" 
+          <img [src]="'https://img.youtube.com/vi/' + video.youtubeId + '/hqdefault.jpg'" 
                alt="Video Thumbnail"
-               (error)="$event.target.src = 'https://img.youtube.com/vi/' + video.youtubeId + '/0.jpg'">
+               loading="lazy">
           <div class="play-overlay">
             <div class="play-icon"></div>
           </div>
@@ -29,14 +29,10 @@
         </iframe>
       </div>
 
-      <!-- Description Area -->
-      <div class="description-container" [class.expanded]="isDescriptionExpanded">
+      <!-- Description Area with Scroll -->
+      <div class="description-container">
         <p>{{ video?.description || 'No description available.' }}</p>
       </div>
-
-      <button class="toggle-description-btn" (click)="toggleDescription()" *ngIf="video.description && video.description.length > 100">
-        {{ isDescriptionExpanded ? 'Mostrar menos' : 'Leer más' }}
-      </button>
 
       <div class="metadata">
         <span class="date">{{ video?.createdAt | date:'longDate' }}</span>

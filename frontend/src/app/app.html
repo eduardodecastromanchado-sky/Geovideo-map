@@ -1,22 +1,16 @@
-<!-- Global Splash Screen (Cyber Globe Scan Animation) -->
-<div class="splash-screen cyber-scan" *ngIf="showSplash" [class.fade-out]="isFadingOut">
-  <div class="grid-layer"></div>
-  <div class="scanner-line"></div>
-  
-  <div class="scan-content">
-    <div class="loading-ui">
-      <div class="scanning-text">ESTABLISHING SATELLITE UPLINK...</div>
-      <div class="status-bar"><div class="progress"></div></div>
-      <div class="coords">LAT: 19.29025 N | LON: 69.42848 W</div>
-    </div>
-
-    <div class="logo-container">
-      <img src="assets/logo.png" alt="SKY DRIFT" class="cyber-logo">
-      <div class="logo-glitch-layer"></div>
-    </div>
-  </div>
-
-  <button class="skip-btn" (click)="onSplashEnded()">BYPASS SYSTEM</button>
+<!-- Global Splash Screen (Intro Video) -->
+<div class="splash-screen" *ngIf="showSplash" [class.fade-out]="isFadingOut" (click)="playManual()">
+  <video #introRef
+         src="assets/intro.mp4" 
+         autoplay 
+         muted 
+         playsinline 
+         (timeupdate)="onTimeUpdate($event)"
+         (ended)="onSplashEnded()" 
+         class="intro-video">
+  </video>
+  <div class="play-hint" *ngIf="showPlayHint">TOCA PARA EMPEZAR</div>
+  <button class="skip-btn" (click)="onSplashEnded()">SKIP INTRO</button>
 </div>
 
 <!-- Subscription Modal -->
