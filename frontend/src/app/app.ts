@@ -1,4 +1,4 @@
-import { Component, signal, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import { Component, signal, ViewChild, ElementRef, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { GlobeViewComponent } from './components/globe-view/globe-view';
@@ -17,6 +17,8 @@ export class App implements AfterViewInit {
   showSubscribeModal = false;
   showPlayHint = false;
 
+  constructor(private cdr: ChangeDetectorRef) {}
+
   ngAfterViewInit(): void {
     if (this.introVideo) {
       const video = this.introVideo.nativeElement;
@@ -28,10 +30,12 @@ export class App implements AfterViewInit {
           .then(() => {
             console.log('Autoplay iniciado con éxito tras 1s');
             this.showPlayHint = false;
+            this.cdr.detectChanges();
           })
           .catch(err => {
             console.warn('Autoplay bloqueado. Requiere interacción.', err);
             this.showPlayHint = true;
+            this.cdr.detectChanges();
           });
       }, 1000);
 
@@ -39,6 +43,7 @@ export class App implements AfterViewInit {
       setTimeout(() => {
         if (video.paused && this.showSplash) {
           this.showPlayHint = true;
+          this.cdr.detectChanges();
         }
       }, 1000);
 
@@ -56,6 +61,7 @@ export class App implements AfterViewInit {
     if (this.introVideo && this.introVideo.nativeElement.paused) {
       this.introVideo.nativeElement.play();
       this.showPlayHint = false;
+      this.cdr.detectChanges();
     }
   }
 
@@ -73,6 +79,7 @@ export class App implements AfterViewInit {
 
   onSplashEnded(): void {
     this.showSplash = false;
+    this.cdr.detectChanges();
   }
 
   onTimeUpdate(event: Event): void {
@@ -82,6 +89,7 @@ export class App implements AfterViewInit {
       if (!this.isFadingOut) {
         console.log('Iniciando transición cinematográfica final.');
         this.isFadingOut = true;
+        this.cdr.detectChanges();
       }
     }
   }
