@@ -50,31 +50,39 @@ export class GlobeViewComponent implements AfterViewInit {
         navigationHelpButton: false,
         baseLayerPicker: false,
         sceneModePicker: false,
-        showRenderLoopErrors: false,
         infoBox: false,
         selectionIndicator: false,
-        // CARGA DIRECTA DE TILES (XYZ): La forma más compatible y rápida del mundo
-        imageryProvider: new Cesium.UrlTemplateImageryProvider({
-          url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-          maximumLevel: 19
-        })
+        // Volvemos a la configuración base que el usuario prefiere
+        imageryProvider: Cesium.createWorldImagery ? Cesium.createWorldImagery() : undefined
       });
 
-      // 1. AJUSTES VISUALES PARA ESTÉTICA DRONE
+      // 1. AJUSTES DE VISUALIZACIÓN (v2.0 - Estabilidad y Estética)
       const scene = this.viewer.scene;
       const globe = scene.globe;
 
-      globe.enableLighting = false; // Iluminación constante
-      globe.baseColor = Cesium.Color.fromCssColorString('#0a1a2f'); // Fondo azul espacial neutro
-      globe.showGroundAtmosphere = false; 
-      scene.skyAtmosphere.show = false;
-      scene.fog.enabled = false; 
+      globe.baseColor = Cesium.Color.BLACK;
+      globe.enableLighting = false; // Mantenemos iluminación constante para evitar globos negros
+      scene.skyAtmosphere.show = true;
+      scene.fog.enabled = true;
+      scene.fog.density = 0.0001;
       scene.logarithmicDepthBuffer = false; 
+
+      // 2. RESPALDO DE SEGURIDAD (Si Ion falla, entra ArcGIS)
+      try {
+        this.viewer.imageryLayers.addImageryProvider(new Cesium.ArcGisMapServerImageryProvider({
+          url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
+        }));
+      } catch (e) {
+        console.warn('Backup imagery failed.');
+      }
       
-      // Soporte para pantallas de 120Hz y alta resolución
-      if (typeof window !== 'undefined') {
-        this.viewer.resolutionScale = window.devicePixelRatio || 1.0;
-        if (this.viewer.resolutionScale > 2.0) this.viewer.resolutionScale = 2.0; // Límite de calidad
+      // Ajuste de nitidez para pantallas de alta resolución
+      this.viewer.resolutionScale = 1.0; 
+      const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+      if (isMobile) {
+        // En móviles Android potentes, un scale muy bajo da problemas de visibilidad
+        this.viewer.resolutionScale = 0.9; 
+        globe.maximumScreenSpaceError = 2.0;
       }
 
       // Detección de dispositivo móvil para resolución
