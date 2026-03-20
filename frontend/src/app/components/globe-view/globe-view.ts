@@ -86,7 +86,6 @@ export class GlobeViewComponent implements AfterViewInit {
       }
 
       // Detección de dispositivo móvil para resolución
-      const isMobile = /Mobi|Android/i.test(navigator.userAgent);
       if (isMobile) {
         this.viewer.resolutionScale = 0.75;
         scene.globe.maximumScreenSpaceError = 2.0;
