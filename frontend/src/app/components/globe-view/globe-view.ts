@@ -84,10 +84,8 @@ export class GlobeViewComponent implements AfterViewInit {
         this.viewer.scene.globe.maximumScreenSpaceError = 1.5;
       }
 
-      // Optimización Móvil y Rendimiento
-      const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+      // Optimización Móvil y Rendimiento final
       if (isMobile) {
-        console.log('Mobile device detected. Optimizing Cesium performance.');
         this.viewer.resolutionScale = 0.7; // Reducir escala de resolución para ganar fluidez
         this.viewer.scene.debugShowFramesPerSecond = false;
         this.viewer.scene.fog.enabled = false; // Deshabilitar niebla para ahorrar GPU
