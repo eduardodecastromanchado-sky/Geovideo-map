@@ -51,25 +51,38 @@ export class GlobeViewComponent implements AfterViewInit {
         sceneModePicker: false,
         infoBox: false,
         selectionIndicator: false,
-        requestRenderMode: true, // Optimización de rendimiento
+        requestRenderMode: true,
         maximumRenderTimeChange: Infinity,
-        // Usamos ArcGIS World Imagery como base SATÉLITE PREMIUM (No requiere Token restrictivo)
+        // Usamos ArcGIS World Imagery como base SATÉLITE DIRECTO
         imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
           url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
         })
       });
 
-      // 1. CONFIGURACIÓN DEL GLOBO PARA EVITAR PANTALLA NEGRA
-      const globe = this.viewer.scene.globe;
-      globe.baseColor = Cesium.Color.fromCssColorString('#021122');
-      globe.showGroundAtmosphere = true;
-      globe.enableLighting = false; // Evita que el lado nocturno sea negro absoluto al inicio
+      // 1. ELIMINAR TINTE AZUL Y OPTIMIZAR PARA ALTA RESOLUCIÓN
+      const scene = this.viewer.scene;
+      const globe = scene.globe;
 
-      // 2. AJUSTES DE ESCENA PARA MÓVIL/ANDROID
+      globe.baseColor = Cesium.Color.BLACK; // Fondo neutro para que no tiña el satélite
+      globe.showGroundAtmosphere = false; // ELIMINA EL HALO AZUL SOBRE EL MAPA
+      scene.skyAtmosphere.show = false; // ELIMINA EL CIELO AZUL QUE TIÑE LOS BORDES
+      scene.fog.enabled = false; // ELIMINA LA NIEBLA QUE ACLARA/AZULEA EL FONDO
+      
+      // 2. AJUSTES TÉCNICOS PARA PANTALLAS DE ALTA RESOLUCIÓN (Android 3216x1440)
       this.viewer.scene.logarithmicDepthBuffer = false; 
-      this.viewer.scene.skyAtmosphere.show = true;
-      this.viewer.scene.fog.enabled = true;
-      this.viewer.scene.fog.density = 0.0001; // Muy suave para dar profundidad sin tapar
+      
+      // Detección de dispositivo móvil mejorada
+      const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+      if (isMobile) {
+        console.log('High-res mobile detected. Balancing quality/performance.');
+        // Para pantallas tan altas como 3216px, un 0.7 es mucho. Bajamos un pelín más o mantenemos según fluidez.
+        this.viewer.resolutionScale = 0.8; // Mayor calidad para esas resoluciones nuevas
+        // Optimizar carga de tiles para que no tarde el satélite
+        this.viewer.scene.globe.maximumScreenSpaceError = 2; 
+      } else {
+        this.viewer.resolutionScale = 1.0;
+        this.viewer.scene.globe.maximumScreenSpaceError = 1.5;
+      }
 
       // Optimización Móvil y Rendimiento
       const isMobile = /Mobi|Android/i.test(navigator.userAgent);
