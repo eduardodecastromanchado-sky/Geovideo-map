@@ -43,6 +43,7 @@ export class GlobeViewComponent implements AfterViewInit {
     if (this.cesiumContainer) {
       // v2.1 - ARQUITECTURA ULTRA-SIMPLE PARA EVITAR ERRORES DE RENDERIZADO
       // Usamos ArcGIS como ÚNICO proveedor para evitar conflictos de Ion (getDerivedResource error)
+       // v3.0 - CONFIGURACIÓN DE MÁXIMA COMPATIBILIDAD (Google Satellite + WebGL Fix)
       this.viewer = new Cesium.Viewer(this.cesiumContainer.nativeElement, {
         animation: false,
         timeline: false,
@@ -53,30 +54,34 @@ export class GlobeViewComponent implements AfterViewInit {
         sceneModePicker: false,
         infoBox: false,
         selectionIndicator: false,
-        imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
-          url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
+        contextOptions: {
+          webgl: {
+            preserveDrawingBuffer: true, // Ayuda a mantener la imagen en algunos móviles Android
+            failIfMajorPerformanceCaveat: false
+          }
+        },
+        // GOOGLE SATELLITE: El proveedor más rápido y compatible del mundo
+        imageryProvider: new Cesium.UrlTemplateImageryProvider({
+          url: 'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
+          maximumLevel: 20
         })
       });
 
       const scene = this.viewer.scene;
       const globe = scene.globe;
 
-      // Estabilidad para móviles Android y PCs con GPUs con fallos de profundidad
       globe.baseColor = Cesium.Color.BLACK;
-      globe.enableLighting = false; // Siempre iluminado para evitar globos negros
-      scene.logarithmicDepthBuffer = false; // Fix crítico para móviles (Android/Chromium)
+      globe.enableLighting = false; 
+      scene.logarithmicDepthBuffer = false; 
+      scene.skyAtmosphere.show = true; // Restauramos estética
+      scene.fog.enabled = true;
+      scene.fog.density = 0.0001;
       
-      // Nitidez para pantallas de alta resolución (Oppo/OnePlus)
+      this.viewer.resolutionScale = 1.0; 
       const isMobile = /Mobi|Android/i.test(navigator.userAgent);
       if (isMobile) {
-        this.viewer.resolutionScale = 0.9; 
+        this.viewer.resolutionScale = 0.85; 
         globe.maximumScreenSpaceError = 2.0;
-        scene.fog.enabled = false;
-      } else {
-        this.viewer.resolutionScale = 1.0;
-        globe.maximumScreenSpaceError = 1.5;
-        scene.fog.enabled = true;
-        scene.fog.density = 0.0001;
       }
 
       // Cámara inicial
