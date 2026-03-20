@@ -51,40 +51,25 @@ export class GlobeViewComponent implements AfterViewInit {
         sceneModePicker: false,
         infoBox: false,
         selectionIndicator: false,
-        // Configuración crítica para evitar el globo negro en Android
-        contextOptions: {
-          webgl: {
-            preserveDrawingBuffer: true
-          }
-        }
+        requestRenderMode: true, // Optimización de rendimiento
+        maximumRenderTimeChange: Infinity,
+        // Usamos ArcGIS World Imagery como base SATÉLITE PREMIUM (No requiere Token restrictivo)
+        imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+          url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
+        })
       });
 
-      // 1. DEFINIR COLOR BASE (Para que nunca sea negro)
-      this.viewer.scene.globe.baseColor = Cesium.Color.fromCssColorString('#001529');
-      
-      // 2. AJUSTAR PRECISIÓN DE PROFUNDIDAD (Evita clipping en móviles)
+      // 1. CONFIGURACIÓN DEL GLOBO PARA EVITAR PANTALLA NEGRA
+      const globe = this.viewer.scene.globe;
+      globe.baseColor = Cesium.Color.fromCssColorString('#021122');
+      globe.showGroundAtmosphere = true;
+      globe.enableLighting = false; // Evita que el lado nocturno sea negro absoluto al inicio
+
+      // 2. AJUSTES DE ESCENA PARA MÓVIL/ANDROID
       this.viewer.scene.logarithmicDepthBuffer = false; 
-
-      // 3. CAPA DE IMÁGENES SATELitales CON RESPALDO
-      const imageryLayers = this.viewer.imageryLayers;
-      imageryLayers.removeAll(); // Limpiamos para control absoluto
-      
-      // Añadimos una capa satelital de Ion (Asset 3 es el World Imagery)
-      try {
-        imageryLayers.addImageryProvider(new Cesium.IonImageryProvider({ assetId: 3 }));
-      } catch (e) {
-        console.error('Error IonImagery:', e);
-      }
-
-      // Añadimos una capa de OpenStreetMap debajo como respaldo de seguridad
-      imageryLayers.addImageryProvider(new Cesium.OpenStreetMapImageryProvider({
-        url: 'https://a.tile.openstreetmap.org/'
-      }), 0);
-
-      // AJUSTES VISUALES
       this.viewer.scene.skyAtmosphere.show = true;
-      this.viewer.scene.fog.enabled = false; // Deshabilitamos niebla en móviles/Android para evitar el "muro azul/negro"
-      this.viewer.scene.globe.showGroundAtmosphere = true;
+      this.viewer.scene.fog.enabled = true;
+      this.viewer.scene.fog.density = 0.0001; // Muy suave para dar profundidad sin tapar
 
       // Optimización Móvil y Rendimiento
       const isMobile = /Mobi|Android/i.test(navigator.userAgent);
