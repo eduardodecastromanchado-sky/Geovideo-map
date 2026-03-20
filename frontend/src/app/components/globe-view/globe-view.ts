@@ -41,8 +41,9 @@ export class GlobeViewComponent implements AfterViewInit {
 
   ngAfterViewInit(): void {
     if (this.cesiumContainer) {
-      // 1. INICIALIZACIÓN ESTÁNDAR Y ESTABLE
-       this.viewer = new Cesium.Viewer(this.cesiumContainer.nativeElement, {
+      // v2.1 - ARQUITECTURA ULTRA-SIMPLE PARA EVITAR ERRORES DE RENDERIZADO
+      // Usamos ArcGIS como ÚNICO proveedor para evitar conflictos de Ion (getDerivedResource error)
+      this.viewer = new Cesium.Viewer(this.cesiumContainer.nativeElement, {
         animation: false,
         timeline: false,
         homeButton: false,
@@ -52,49 +53,33 @@ export class GlobeViewComponent implements AfterViewInit {
         sceneModePicker: false,
         infoBox: false,
         selectionIndicator: false,
-        // Volvemos a la configuración base que el usuario prefiere
-        imageryProvider: Cesium.createWorldImagery ? Cesium.createWorldImagery() : undefined
+        imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+          url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
+        })
       });
 
-      // 1. AJUSTES DE VISUALIZACIÓN (v2.0 - Estabilidad y Estética)
       const scene = this.viewer.scene;
       const globe = scene.globe;
 
+      // Estabilidad para móviles Android y PCs con GPUs con fallos de profundidad
       globe.baseColor = Cesium.Color.BLACK;
-      globe.enableLighting = false; // Mantenemos iluminación constante para evitar globos negros
-      scene.skyAtmosphere.show = true;
-      scene.fog.enabled = true;
-      scene.fog.density = 0.0001;
-      scene.logarithmicDepthBuffer = false; 
-
-      // 2. RESPALDO DE SEGURIDAD (Si Ion falla, entra ArcGIS)
-      try {
-        this.viewer.imageryLayers.addImageryProvider(new Cesium.ArcGisMapServerImageryProvider({
-          url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
-        }));
-      } catch (e) {
-        console.warn('Backup imagery failed.');
-      }
+      globe.enableLighting = false; // Siempre iluminado para evitar globos negros
+      scene.logarithmicDepthBuffer = false; // Fix crítico para móviles (Android/Chromium)
       
-      // Ajuste de nitidez para pantallas de alta resolución
-      this.viewer.resolutionScale = 1.0; 
+      // Nitidez para pantallas de alta resolución (Oppo/OnePlus)
       const isMobile = /Mobi|Android/i.test(navigator.userAgent);
       if (isMobile) {
-        // En móviles Android potentes, un scale muy bajo da problemas de visibilidad
         this.viewer.resolutionScale = 0.9; 
         globe.maximumScreenSpaceError = 2.0;
-      }
-
-      // Detección de dispositivo móvil para resolución
-      if (isMobile) {
-        this.viewer.resolutionScale = 0.75;
-        scene.globe.maximumScreenSpaceError = 2.0;
+        scene.fog.enabled = false;
       } else {
         this.viewer.resolutionScale = 1.0;
-        scene.globe.maximumScreenSpaceError = 1.5;
+        globe.maximumScreenSpaceError = 1.5;
+        scene.fog.enabled = true;
+        scene.fog.density = 0.0001;
       }
 
-      // Posicionamiento inicial de la cámara
+      // Cámara inicial
       this.viewer.camera.setView({
         destination: Cesium.Cartesian3.fromDegrees(-70, 18, 15000000),
         orientation: {
@@ -104,7 +89,7 @@ export class GlobeViewComponent implements AfterViewInit {
         }
       });
 
-      // Initialize styles
+      // Estilos de puntos
       this.defaultPointStyle = {
         pixelSize: 8,
         color: Cesium.Color.DEEPSKYBLUE,
@@ -189,7 +174,6 @@ export class GlobeViewComponent implements AfterViewInit {
 
     this.handler.setInputAction((click: any) => {
       const pickedObject = this.viewer.scene.pick(click.position);
-      
       if (Cesium.defined(pickedObject) && pickedObject.id && (pickedObject.id as any).video) {
         const entity = pickedObject.id;
         const video = (entity as any).video;
