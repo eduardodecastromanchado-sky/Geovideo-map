@@ -51,24 +51,40 @@ export class GlobeViewComponent implements AfterViewInit {
         sceneModePicker: false,
         infoBox: false,
         selectionIndicator: false,
-        // Usamos la capa de terreno y fotos base de Cesium por defecto
-        terrainProvider: Cesium.createWorldTerrain ? Cesium.createWorldTerrain() : undefined
+        // Configuración crítica para evitar el globo negro en Android
+        contextOptions: {
+          webgl: {
+            preserveDrawingBuffer: true
+          }
+        }
       });
 
-      // Asegurar que tenemos una capa de imágenes satelitales (World Imagery)
-      // Si el usuario no tiene token, Cesium mostrará un aviso pero intentará cargar texturas básicas
+      // 1. DEFINIR COLOR BASE (Para que nunca sea negro)
+      this.viewer.scene.globe.baseColor = Cesium.Color.fromCssColorString('#001529');
+      
+      // 2. AJUSTAR PRECISIÓN DE PROFUNDIDAD (Evita clipping en móviles)
+      this.viewer.scene.logarithmicDepthBuffer = false; 
+
+      // 3. CAPA DE IMÁGENES SATELitales CON RESPALDO
+      const imageryLayers = this.viewer.imageryLayers;
+      imageryLayers.removeAll(); // Limpiamos para control absoluto
+      
+      // Añadimos una capa satelital de Ion (Asset 3 es el World Imagery)
       try {
-        this.viewer.imageryLayers.addImageryProvider(new Cesium.IonImageryProvider({ assetId: 3 }));
+        imageryLayers.addImageryProvider(new Cesium.IonImageryProvider({ assetId: 3 }));
       } catch (e) {
-        console.warn('Fallo al cargar IonImageryProvider, usando alternativa.', e);
+        console.error('Error IonImagery:', e);
       }
 
-      // AJUSTE CRÍTICO: Eliminar el exceso de color azul (atmósfera/niebla)
+      // Añadimos una capa de OpenStreetMap debajo como respaldo de seguridad
+      imageryLayers.addImageryProvider(new Cesium.OpenStreetMapImageryProvider({
+        url: 'https://a.tile.openstreetmap.org/'
+      }), 0);
+
+      // AJUSTES VISUALES
       this.viewer.scene.skyAtmosphere.show = true;
-      this.viewer.scene.fog.enabled = true;
-      this.viewer.scene.fog.density = 0.0001; // Muy baja para que no se vea azul/blanco
+      this.viewer.scene.fog.enabled = false; // Deshabilitamos niebla en móviles/Android para evitar el "muro azul/negro"
       this.viewer.scene.globe.showGroundAtmosphere = true;
-      this.viewer.scene.highDynamicRange = true;
 
       // Optimización Móvil y Rendimiento
       const isMobile = /Mobi|Android/i.test(navigator.userAgent);
