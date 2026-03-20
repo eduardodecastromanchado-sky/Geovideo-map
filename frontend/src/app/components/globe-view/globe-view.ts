@@ -3,10 +3,14 @@ import { VideoApiService, Page, Video } from '../../services/video-api';
 
 declare const Cesium: any; // Use 'any' to avoid TypeScript errors for the global Cesium object
 
+import { VideoInfoPanelComponent } from '../video-info-panel/video-info-panel.component';
+
 @Component({
   selector: 'app-globe-view',
   templateUrl: './globe-view.html',
-  styleUrls: ['./globe-view.scss']
+  styleUrls: ['./globe-view.scss'],
+  standalone: true, // Mark this component as standalone
+  imports: [VideoInfoPanelComponent] // Import the panel component here
 })
 export class GlobeViewComponent implements AfterViewInit {
 
