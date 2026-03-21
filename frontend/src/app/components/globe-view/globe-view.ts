@@ -58,11 +58,19 @@ export class GlobeViewComponent implements AfterViewInit {
 
       // AJUSTES CRÍTICOS DE VISIBILIDAD (Solucionan el problema original de móvil)
       const scene = this.viewer.scene;
-      scene.globe.enableLighting = false; // El mundo siempre iluminado (evita globo negro nocturno)
-      scene.globe.baseColor = Cesium.Color.BLACK;
       
-      // Compatibilidad WebGL básica
-      scene.logarithmicDepthBuffer = false;
+      // PARCHES v4.1 PARA MÓVILES (Android/Oppo/OnePlus)
+      scene.highDynamicRange = false; // El HDR causa globos negros en muchas GPUs móviles adreno
+      scene.globe.enableLighting = false; // Sin sombras nocturnas
+      scene.globe.baseColor = Cesium.Color.fromCssColorString('#021122'); // Azul oscuro de seguridad
+      scene.logarithmicDepthBuffer = false; // Crítico para la precisión de profundidad en móviles
+      
+      const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+      if (isMobile) {
+        // En móviles bajamos la carga geométrica para evitar fallos de memoria
+        scene.globe.maximumScreenSpaceError = 2.0;
+        this.viewer.resolutionScale = 0.85; 
+      }
 
       // Cámara inicial
       this.viewer.camera.setView({
