@@ -70,11 +70,15 @@ export class GlobeViewComponent implements AfterViewInit {
         // En móviles bajamos la carga geométrica para evitar fallos de memoria
         scene.globe.maximumScreenSpaceError = 2.0;
         this.viewer.resolutionScale = 0.85; 
+        
+        // PARCHE DE PRECISIÓN PARA MÓVILES ADRENO/MALI
+        scene.globe.depthTestAgainstTerrain = false; // Evita que el mapa desaparezca por falta de precisión Z
       }
 
-      // Cámara inicial
+      // Cámara inicial - ACERCAMOS A 4,000km (en lugar de 15,000km)
+      // A esta distancia los móviles NO suelen fallar en la precisión de renderizado
       this.viewer.camera.setView({
-        destination: Cesium.Cartesian3.fromDegrees(-70, 18, 15000000),
+        destination: Cesium.Cartesian3.fromDegrees(-70, 18, 4000000), 
         orientation: {
           heading: 0,
           pitch: Cesium.Math.toRadians(-90),
