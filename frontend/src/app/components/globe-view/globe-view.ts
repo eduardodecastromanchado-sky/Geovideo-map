@@ -56,23 +56,25 @@ export class GlobeViewComponent implements AfterViewInit {
         requestRenderMode: false // Renderizado continuo para evitar pantallas negras/congeladas
       });
 
-      // AJUSTES CRÍTICOS DE VISIBILIDAD (Solucionan el problema original de móvil)
+      // AJUSTES CRÍTICOS - Basados en CesiumJS Issues #7871, #10442 y #12936
       const scene = this.viewer.scene;
+      const globe = scene.globe;
       
-      // PARCHES v4.1 PARA MÓVILES (Android/Oppo/OnePlus)
-      scene.highDynamicRange = false; // El HDR causa globos negros en muchas GPUs móviles adreno
-      scene.globe.enableLighting = false; // Sin sombras nocturnas
-      scene.globe.baseColor = Cesium.Color.fromCssColorString('#021122'); // Azul oscuro de seguridad
-      scene.logarithmicDepthBuffer = false; // Crítico para la precisión de profundidad en móviles
+      // FIX UNIVERSAL (PC y Móvil)
+      scene.highDynamicRange = false; // HDR causa globos negros en GPUs Adreno (Qualcomm)
+      globe.enableLighting = false; // Sin iluminación dinámica (evita sombra nocturna)
+      globe.showGroundAtmosphere = false; // CLAVE: Este + enableLighting = globo negro en Adreno (#7871)
+      scene.logarithmicDepthBuffer = false;
+      globe.depthTestAgainstTerrain = false;
       
+      // FIX ESPECÍFICO PARA MÓVILES ANDROID (Chrome 140+ / Adreno / Mali)
       const isMobile = /Mobi|Android/i.test(navigator.userAgent);
       if (isMobile) {
-        // En móviles bajamos la carga geométrica para evitar fallos de memoria
-        scene.globe.maximumScreenSpaceError = 2.0;
-        this.viewer.resolutionScale = 0.85; 
-        
-        // PARCHE DE PRECISIÓN PARA MÓVILES ADRENO/MALI
-        scene.globe.depthTestAgainstTerrain = false; // Evita que el mapa desaparezca por falta de precisión Z
+        this.viewer.resolutionScale = 0.5; // Reducción agresiva recomendada por la comunidad CesiumJS
+        globe.maximumScreenSpaceError = 4; // Reducir detalle de tiles lejanos para evitar el bug #12936
+        scene.skyAtmosphere.show = false; // La atmósfera interfiere con el renderizado en Adreno
+        scene.fog.enabled = false;
+        scene.fxaa = false; // Desactivar antialiasing para ahorrar GPU
       }
 
       // Cámara inicial - ACERCAMOS A 4,000km (en lugar de 15,000km)
