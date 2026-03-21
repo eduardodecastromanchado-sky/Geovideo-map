@@ -94,7 +94,7 @@
     // En móviles verticales: mostrar el vídeo centrado para que se vean letras y logo
     @media (max-width: 768px) and (orientation: portrait) {
       width: 100%;
-      height: 70vh; // 70% de la pantalla para ver bien el contenido del vídeo
+      height: 85vh; // 85% de la pantalla
       object-fit: contain; // Mostrar completo, sin recortar
       position: absolute;
       top: 50%;

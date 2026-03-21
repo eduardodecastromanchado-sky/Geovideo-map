@@ -70,8 +70,8 @@ export class GlobeViewComponent implements AfterViewInit {
       // FIX ESPECÍFICO PARA MÓVILES ANDROID (Chrome 140+ / Adreno / Mali)
       const isMobile = /Mobi|Android/i.test(navigator.userAgent);
       if (isMobile) {
-        this.viewer.resolutionScale = 0.75; // Más nítido (subido de 0.65)
-        globe.maximumScreenSpaceError = 2.5; // Tiles más detallados
+        this.viewer.resolutionScale = 0.85; // Calidad definitiva en móvil
+        globe.maximumScreenSpaceError = 2; // Máximo detalle de tiles
         scene.skyAtmosphere.show = false;
         scene.fog.enabled = false;
         scene.fxaa = false;
