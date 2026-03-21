@@ -11,7 +11,7 @@
   align-items: center;
   pointer-events: none; // Permite clics al globo de fondo
 
-   .branding {
+  .branding {
     display: flex;
     align-items: center;
     gap: 15px;
@@ -30,7 +30,7 @@
     .brand-text {
       display: flex;
       flex-direction: column;
-      
+
       .main-title {
         font-family: 'Orbitron', 'Inter', sans-serif;
         font-weight: 900;
@@ -91,11 +91,11 @@
     height: 100%;
     object-fit: cover;
 
-    // En móviles recortamos arriba/abajo para que el vídeo llene toda la pantalla
+    // En móviles verticales: mostrar el vídeo centrado para que se vean letras y logo
     @media (max-width: 768px) and (orientation: portrait) {
-      width: auto;
-      height: 120%; // Agrandar verticalmente para recortar bordes negros
-      min-width: 100%;
+      width: 100%;
+      height: 70vh; // 70% de la pantalla para ver bien el contenido del vídeo
+      object-fit: contain; // Mostrar completo, sin recortar
       position: absolute;
       top: 50%;
       left: 50%;
@@ -148,8 +148,15 @@
 }
 
 @keyframes blink {
-  0%, 100% { opacity: 0.5; }
-  50% { opacity: 1; }
+
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+
+  50% {
+    opacity: 1;
+  }
 }
 
 .modal-backdrop {
@@ -209,7 +216,7 @@
       font-size: 1rem;
       cursor: pointer;
       transition: all 0.3s;
-      
+
       &:hover {
         background: #cc0000;
         transform: translateY(-2px);
@@ -225,7 +232,7 @@
       border-radius: 12px;
       cursor: pointer;
       transition: all 0.3s;
-      
+
       &:hover {
         color: #fff;
         background: rgba(255, 255, 255, 0.05);
@@ -235,16 +242,35 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes zoomIn {
-  from { transform: scale(0.8); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 @keyframes blink {
-  0%, 100% { opacity: 0.5; }
-  50% { opacity: 1; }
+
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+
+  50% {
+    opacity: 1;
+  }
 }
