@@ -70,11 +70,11 @@ export class GlobeViewComponent implements AfterViewInit {
       // FIX ESPECÍFICO PARA MÓVILES ANDROID (Chrome 140+ / Adreno / Mali)
       const isMobile = /Mobi|Android/i.test(navigator.userAgent);
       if (isMobile) {
-        this.viewer.resolutionScale = 0.5; // Reducción agresiva recomendada por la comunidad CesiumJS
-        globe.maximumScreenSpaceError = 4; // Reducir detalle de tiles lejanos para evitar el bug #12936
-        scene.skyAtmosphere.show = false; // La atmósfera interfiere con el renderizado en Adreno
+        this.viewer.resolutionScale = 0.65; // Equilibrio nitidez/rendimiento (0.5 era demasiado borroso)
+        globe.maximumScreenSpaceError = 3; // Más detalle de tiles (4 era muy agresivo)
+        scene.skyAtmosphere.show = false;
         scene.fog.enabled = false;
-        scene.fxaa = false; // Desactivar antialiasing para ahorrar GPU
+        scene.fxaa = false;
       }
 
       // Cámara inicial - ACERCAMOS A 4,000km (en lugar de 15,000km)
