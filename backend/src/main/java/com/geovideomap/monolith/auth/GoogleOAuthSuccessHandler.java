@@ -3,6 +3,7 @@ package com.geovideomap.monolith.auth;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -20,7 +21,7 @@ public class GoogleOAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHan
     private final AuthService authService;
     private final String frontendUrl;
 
-    public GoogleOAuthSuccessHandler(AuthService authService,
+    public GoogleOAuthSuccessHandler(@Lazy AuthService authService,
                                      @Value("${app.frontend-url:http://localhost:4200}") String frontendUrl) {
         this.authService = authService;
         this.frontendUrl = frontendUrl;
