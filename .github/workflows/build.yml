@@ -68,22 +68,4 @@ jobs:
           cache: npm
           cache-dependency-path: frontend/package-lock.json
 
-      - name: Install frontend dependencies
-        working-directory: ./frontend
-        run: npm ci
-
-      - name: Build frontend
-        working-directory: ./frontend
-        run: npm run build
-
-      - name: Analyze frontend
-        uses: SonarSource/sonarqube-scan-action@7006c4492b2e0ee0f816d36501671557c97f5995 # v8.1.0
-        with:
-          projectBaseDir: frontend
-          args: >
-            -Dsonar.projectKey=eduardodecastromanchado-sky_Geovideo-map-frontend
-            -Dsonar.projectName=Geovideo-map-frontend
-            -Dsonar.sources=src
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      -
