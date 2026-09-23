@@ -6,12 +6,14 @@ on:
       - main
 
 jobs:
-  build:
-    name: Build and analyze
+
+  backend:
+    name: Backend - Build and analyze
     runs-on: self-hosted
 
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           fetch-depth: 0
 
@@ -19,7 +21,7 @@ jobs:
         uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9 # v4.8.0
         with:
           java-version: 17
-          distribution: 'zulu'
+          distribution: zulu
 
       - name: Cache SonarQube packages
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
@@ -35,42 +37,53 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
 
-      - name: Check Sonar configuration
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        run: |
-          echo "SONAR_HOST_URL length: ${#SONAR_HOST_URL}"
-          echo "SONAR_TOKEN length: ${#SONAR_TOKEN}"
-
-          case "$SONAR_HOST_URL" in
-            *$'\n'*|*$'\r'*)
-              echo "ERROR: SONAR_HOST_URL contains newline"
-              exit 1
-              ;;
-            *)
-              echo "SONAR_HOST_URL format: OK"
-              ;;
-          esac
-
-          case "$SONAR_TOKEN" in
-            *$'\n'*|*$'\r'*)
-              echo "ERROR: SONAR_TOKEN contains newline"
-              exit 1
-              ;;
-            *)
-              echo "SONAR_TOKEN format: OK"
-              ;;
-          esac
-
-          curl -sS -o /dev/null \
-            -w "SonarQube HTTP: %{http_code}\n" \
-            "$SONAR_HOST_URL/api/system/status"
-
-      - name: Build and analyze
+      - name: Build and analyze backend
         working-directory: ./backend
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
           REMEMBER_ME_KEY: sonar-test-remember-me-key
-        run: mvn -B verify -DskipTests org.sonarsource.scanner.maven:sonar-maven-plugin:5.8.0.7211:sonar -Dsonar.projectKey=eduardodecastromanchado-sky_Geovideo-map_3d19bc6c-89da-4414-be50-a7677b1f3414 -Dsonar.projectName='Geovideo-map'
+        run: >
+          mvn -B verify
+          -DskipTests
+          org.sonarsource.scanner.maven:sonar-maven-plugin:5.8.0.7211:sonar
+          -Dsonar.projectKey=eduardodecastromanchado-sky_Geovideo-map_3d19bc6c-89da-4414-be50-a7677b1f3414
+          -Dsonar.projectName='Geovideo-map'
+
+
+  frontend:
+    name: Frontend - Build and analyze
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: ./frontend
+        run: npm run build
+
+      - name: Analyze frontend
+        uses: SonarSource/sonarqube-scan-action@7006c4492b2e0ee0f816d36501671557c97f5995 # v8.1.0
+        with:
+          projectBaseDir: frontend
+          args: >
+            -Dsonar.projectKey=eduardodecastromanchado-sky_Geovideo-map-frontend
+            -Dsonar.projectName=Geovideo-map-frontend
+            -Dsonar.sources=src
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
