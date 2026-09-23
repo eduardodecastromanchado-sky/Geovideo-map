@@ -37,4 +37,5 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          REMEMBER_ME_KEY: sonar-test-remember-me-key
         run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=eduardodecastromanchado-sky_Geovideo-map_3d19bc6c-89da-4414-be50-a7677b1f3414 -Dsonar.projectName='Geovideo-map'
