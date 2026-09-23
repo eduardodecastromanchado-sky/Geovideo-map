@@ -34,53 +34,54 @@ jobs:
         with:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-k**s: ${{ runner.os }}-m2
+          restore-keys: ${{ runner.os }}-m2
 
-      - n**e: Build and analyze backend
-    **  working-directory: ./backend
-  **    env:
-          SONAR_TOKEN: $** secrets.SONAR_TOKEN }}
-         **ONAR_HOST_URL: ${{ secrets.SONAR_**ST_URL }}
-          REMEMBER_ME_K**: sonar-test-remember-me-key
-    **  run: >
+      - name: Build and analyze backend
+        working-directory: ./backend
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          REMEMBER_ME_KEY: sonar-test-remember-me-key
+        run: >
           mvn -B verify
-**        -DskipTests
-          org**onarsource.scanner.maven:sonar-ma**n-plugin:5.8.0.7211:sonar
-       ** -Dsonar.projectKey=eduardodecast**manchado-sky_Geovideo-map_3d19bc6**89da-4414-be50-a7677b1f3414
-     **   -Dsonar.projectName=Geovideo-m**
+          -DskipTests
+          org.sonarsource.scanner.maven:sonar-maven-plugin:5.8.0.7211:sonar
+          -Dsonar.projectKey=eduardodecastromanchado-sky_Geovideo-map_3d19bc6c-89da-4414-be50-a7677b1f3414
+          -Dsonar.projectName=Geovideo-map
 
   frontend:
-    name: Frontend **Build and analyze
-    runs-on: se**-hosted
+    name: Frontend - Build and analyze
+    runs-on: self-hosted
 
     steps:
-      - name:**heckout
-        uses: actions/che**out@34e114876b0b11c390a56381ad16e**13914f8d5
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
         with:
-         **etch-depth: 0
+          fetch-depth: 0
 
-      - name: Set ** Node.js
-        uses: actions/se**p-node@v6
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
         with:
-         **ode-version: "22"
-          cache**npm
-          cache-dependency-pa**: frontend/package-lock.json
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
 
-   ** - name: Install frontend depende**ies
-        working-directory: ./**ontend
+      - name: Install frontend dependencies
+        working-directory: ./frontend
         run: npm ci
 
-     ** name: Build frontend
-        wor**ng-directory: ./frontend
-        **n: npm run build
+      - name: Build frontend
+        working-directory: ./frontend
+        run: npm run build
 
-      - name: A**lyze frontend
-        uses: Sonar**urce/sonarqube-scan-action@7006c4**2b2e0ee0f816d36501671557c97f5995
-**      with:
-          projectBase**r: frontend
+      - name: Analyze frontend
+        uses: SonarSource/sonarqube-scan-action@7006c4492b2e0ee0f816d36501671557c97f5995
+        with:
+          projectBaseDir: frontend
           args: >
-   **       -Dsonar.projectKey=eduardo**castromanchado-sky_Geovideo-map-f**ntend
-            -Dsonar.project**me=Geovideo-map-frontend
-        **  -Dsonar.sources=src
-        env**          SONAR_TOKEN: ${{ secret**SONAR_TOKEN }}
-          SONAR_HO**_URL: ${{ secrets.SONAR_HOST_URL **
+            -Dsonar.projectKey=eduardodecastromanchado-sky_Geovideo-map-frontend
+            -Dsonar.projectName=Geovideo-map-frontend
+            -Dsonar.sources=src
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
