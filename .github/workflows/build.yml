@@ -39,7 +39,7 @@ jobs:
       - name: Build and analyze backend
         working-directory: ./backend
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_BACKEND }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
           REMEMBER_ME_KEY: sonar-test-remember-me-key
         run: >
