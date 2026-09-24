@@ -137,7 +137,7 @@ export class App implements AfterViewInit, OnInit {
 
   goToGoogle(): void {
     // Redirects to Spring backend OAuth2 flow — no Angular routing involved
-    window.location.href = 'http://localhost:8080/oauth2/authorization/google';
+    window.location.href = '/oauth2/authorization/google';
   }
 
   async doLogout(): Promise<void> {

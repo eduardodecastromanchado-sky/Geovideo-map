@@ -41,8 +41,12 @@ export class GlobeViewComponent implements AfterViewInit {
 
   ngAfterViewInit(): void {
     if (this.cesiumContainer) {
-      // v4.0 - RESET TOTAL A CONFIGURACIÓN NATIVA ESTABLE
-      // Dejamos que Cesium use su proveedor satelital por defecto (Ion)
+      // Proveedor satelital ArcGIS World Imagery (alta resolución, estable y sin necesidad de tokens)
+      const satelliteProvider = new Cesium.UrlTemplateImageryProvider({
+        url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+        maximumLevel: 19
+      });
+
       this.viewer = new Cesium.Viewer(this.cesiumContainer.nativeElement, {
         animation: false,
         timeline: false,
@@ -53,7 +57,8 @@ export class GlobeViewComponent implements AfterViewInit {
         sceneModePicker: false,
         infoBox: false,
         selectionIndicator: false,
-        requestRenderMode: false // Renderizado continuo para evitar pantallas negras/congeladas
+        requestRenderMode: false, // Renderizado continuo para evitar pantallas negras/congeladas
+        baseLayer: new Cesium.ImageryLayer(satelliteProvider)
       });
 
       // AJUSTES CRÍTICOS - Basados en CesiumJS Issues #7871, #10442 y #12936
@@ -62,6 +67,7 @@ export class GlobeViewComponent implements AfterViewInit {
       
       // FIX UNIVERSAL (PC y Móvil)
       scene.highDynamicRange = false; // HDR causa globos negros en GPUs Adreno (Qualcomm)
+      globe.baseColor = Cesium.Color.BLACK;
       globe.enableLighting = false; // Sin iluminación dinámica (evita sombra nocturna)
       globe.showGroundAtmosphere = false; // CLAVE: Este + enableLighting = globo negro en Adreno (#7871)
       scene.logarithmicDepthBuffer = false;

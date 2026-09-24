@@ -3,7 +3,7 @@
 <ng-container *ngIf="video">
   <div class="modal-container">
     <div class="panel-header">
-      <h4 class="modal-video-title">{{ video?.title }}</h4>
+      <h4 class="modal-video-title">{{ video.title }}</h4>
       <button class="close-btn" (click)="close.emit()">&times;</button>
     </div>
       <!-- Video Area -->
@@ -31,12 +31,12 @@
 
       <!-- Description Area with Scroll -->
       <div class="description-container">
-        <p>{{ video?.description || 'No description available.' }}</p>
+        <p>{{ video.description || 'No description available.' }}</p>
       </div>
 
       <div class="metadata">
-        <span class="date">{{ video?.createdAt | date:'longDate' }}</span>
-        <span class="coords">{{ video?.latitude | number:'1.4-4' }}, {{ video?.longitude | number:'1.4-4' }}</span>
+        <span class="date">{{ video.createdAt | date:'longDate' }}</span>
+        <span class="coords">{{ video.latitude | number:'1.4-4' }}, {{ video.longitude | number:'1.4-4' }}</span>
       </div>
     </div>
 </ng-container>

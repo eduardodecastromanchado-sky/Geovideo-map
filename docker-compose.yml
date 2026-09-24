@@ -13,6 +13,8 @@ services:
       SPRING_DATASOURCE_PASSWORD: GokuBot2026!
       # Update this if you have an external Redis, currently pointing to same host
       SPRING_REDIS_HOST: 192.168.3.75
+      REMEMBER_ME_KEY: geovideo-secret-remember-me-key-2026
+      FRONTEND_URL: http://localhost
 
   frontend:
     build: ./frontend
